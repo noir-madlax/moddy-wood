@@ -10,6 +10,10 @@ module.exports = {
       colors: {
         primary: '#F4A261',
         background: '#FDF8F4',
+        tarot: {
+          bg: '#2B2B44',
+          card: '#1E1E2F',
+        },
       },
     },
   },
