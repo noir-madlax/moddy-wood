@@ -1,70 +1,95 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 
 type Message = {
   content: string
-  isUser: boolean
+  role: 'user' | 'assistant'
 }
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
+    // 添加初始的助手消息
     {
-      content: "I am currently studying abroad and facing academic pressure. I am very worried about failing exams.",
-      isUser: true
-    },
-    {
-      content: "I can feel the anxiety you have when facing academic and exam pressure. This feeling is really heavy. Let's discuss it together.",
-      isUser: false
-    },
-    {
-      content: "How can I overcome these pressures?",
-      isUser: true
-    },
-    {
-      content: "The process of overcoming pressure can be very complicated, but first of all, it is very important to find a relaxation method suitable for yourself. Have you ever tried some effective study methods or relaxation techniques?",
-      isUser: false
-    },
-    {
-      content: "I often relieve my stress by eating some delicious food. Are there any other ways to relieve stress?",
-      isUser: true
+      content: "你最近感觉怎么样？",
+      role: "assistant"
     }
   ])
-
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // 自动滚动到最新消息
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
 
   const sendMessage = async () => {
     if (!inputValue.trim() || isLoading) return
 
     try {
       setIsLoading(true)
+      
       // 添加用户消息
-      const userMessage = { content: inputValue, isUser: true }
+      const userMessage: Message = { content: inputValue, role: 'user' }
       setMessages(prev => [...prev, userMessage])
       setInputValue('')
 
-      // 调用后端 API
+      // 调用 API
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: inputValue }),
+        body: JSON.stringify({
+          messages: [...messages, userMessage]
+        }),
       })
 
-      if (!response.ok) throw new Error('Failed to send message')
+      if (!response.ok) {
+        throw new Error('Failed to send message')
+      }
 
-      const data = await response.json()
-      
-      // 添加 AI 回复
-      const aiMessage = { content: data.reply, isUser: false }
-      setMessages(prev => [...prev, aiMessage])
+      // 处理流式响应
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let aiResponse = ''
+
+      if (reader) {
+        // 添加一个空的 AI 消息
+        setMessages(prev => [...prev, { role: 'assistant', content: '' }])
+
+        while (true) {
+          const { done, value } = await reader.read()
+          if (done) break
+
+          const chunk = decoder.decode(value)
+          const lines = chunk.split('\n')
+          
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const content = line.slice(6)
+              if (content) {
+                aiResponse += content
+                // 更新最后一条消息的内容
+                setMessages(prev => {
+                  const newMessages = [...prev]
+                  newMessages[newMessages.length - 1] = {
+                    role: 'assistant',
+                    content: aiResponse
+                  }
+                  return newMessages
+                })
+              }
+            }
+          }
+        }
+      }
+
     } catch (error) {
       console.error('Failed to send message:', error)
-      // 可以添加错误提示
     } finally {
       setIsLoading(false)
     }
@@ -98,21 +123,21 @@ export default function ChatPage() {
         </div>
       </div>
 
-      {/* 消息列表 - 添加上下 padding 以避免被固定元素遮挡 */}
+      {/* 消息列表 */}
       <div className="flex-1 px-4 py-6 overflow-y-auto space-y-4 mt-28 mb-24">
         {messages.map((message, index) => (
           <div
             key={index}
-            className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             <div
               className={`max-w-[80%] rounded-2xl p-4 ${
-                message.isUser
+                message.role === 'user'
                   ? 'bg-[#F4A261] text-white'
                   : 'bg-[#FEF1E6] text-gray-800 border border-dashed border-gray-300'
               }`}
             >
-              {!message.isUser && (
+              {message.role === 'assistant' && (
                 <span className="inline-block w-2 h-2 bg-yellow-300 rounded-full mr-1">
                   ✨
                 </span>
@@ -121,11 +146,15 @@ export default function ChatPage() {
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* 固定底部输入区域 */}
       <div className="fixed bottom-0 left-0 right-0 border-t bg-white p-4 flex items-center gap-4">
-        <button className="w-10 h-10 rounded-full bg-[#F4A261] flex items-center justify-center">
+        <button 
+          className="w-10 h-10 rounded-full bg-[#F4A261] flex items-center justify-center"
+          onClick={() => window.location.reload()}
+        >
           <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
             <path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/>
           </svg>
@@ -141,9 +170,9 @@ export default function ChatPage() {
             disabled={isLoading}
           />
           <button 
+            onClick={sendMessage}
             className={`w-8 h-8 rounded-full flex items-center justify-center ml-2 
               ${isLoading ? 'bg-gray-400' : 'bg-[#F4A261]'}`}
-            onClick={sendMessage}
             disabled={isLoading}
           >
             {isLoading ? (
