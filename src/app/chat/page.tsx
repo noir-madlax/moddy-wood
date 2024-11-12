@@ -13,7 +13,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
     // 添加初始的助手消息
     {
-      content: "你最近感觉怎么样？",
+      content: "Hello! How are you feeling today?",
       role: "assistant"
     }
   ])
