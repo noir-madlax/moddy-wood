@@ -106,12 +106,12 @@ export default function Home() {
           </svg>
           <span className="text-xs mt-1">Chat</span>
         </Link>
-        <div className="flex flex-col items-center text-gray-400">
+        <Link href="/journal" className="flex flex-col items-center text-gray-400 hover:text-[#F4A261]">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M21 3h-6.18C14.4 1.84 13.3 1 12 1s-2.4.84-2.82 2H3v18h18V3zm-9 0c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm7 16H5V5h2v3h10V5h2v14z" />
           </svg>
           <span className="text-xs mt-1">Journal</span>
-        </div>
+        </Link>
       </div>
     </main>
   )

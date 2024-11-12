@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 const cards = [
   { id: 1, image: '/tarot/card1.png' },
@@ -14,6 +15,7 @@ const cards = [
 export default function TarotPage() {
   const [currentCard, setCurrentCard] = useState(0)
   const [dragDirection, setDragDirection] = useState<'left' | 'right' | null>(null)
+  const router = useRouter()
 
   const handleDragEnd = (event: any, info: any) => {
     const swipeThreshold = 100
@@ -47,6 +49,20 @@ export default function TarotPage() {
       x: direction === 'left' ? -1000 : 1000,
       opacity: 0
     })
+  }
+
+  const handleCardClick = (cardId: number) => {
+    switch(cardId) {
+      case 1:
+        router.push('/draw')
+        break
+      case 2:
+        router.push('/breath')
+        break
+      case 3:
+        router.push('/burn')
+        break
+    }
   }
 
   return (
@@ -87,7 +103,8 @@ export default function TarotPage() {
             dragConstraints={{ left: 0, right: 0 }}
             dragElastic={0.7}
             onDragEnd={handleDragEnd}
-            className="w-full max-w-[380px] aspect-[3/4] flex items-center justify-center"
+            onClick={() => handleCardClick(cards[currentCard].id)}
+            className="w-full max-w-[380px] aspect-[3/4] flex items-center justify-center cursor-pointer"
           >
             <Image
               src={cards[currentCard].image}
