@@ -21,34 +21,16 @@ export default function TarotPage() {
     const swipeThreshold = 100
     
     if (info.offset.x < -swipeThreshold) {
-      // 向左滑动，显示右边的卡片
       if (currentCard < cards.length - 1) {
         setDragDirection('left')
         setCurrentCard(prev => prev + 1)
       }
     } else if (info.offset.x > swipeThreshold) {
-      // 向右滑动，显示左边的卡片
       if (currentCard > 0) {
         setDragDirection('right')
         setCurrentCard(prev => prev - 1)
       }
     }
-  }
-
-  // 定义动画变体
-  const variants = {
-    enter: (direction: 'left' | 'right') => ({
-      x: direction === 'left' ? 1000 : -1000,
-      opacity: 0
-    }),
-    center: {
-      x: 0,
-      opacity: 1
-    },
-    exit: (direction: 'left' | 'right') => ({
-      x: direction === 'left' ? -1000 : 1000,
-      opacity: 0
-    })
   }
 
   const handleCardClick = (cardId: number) => {
@@ -63,6 +45,21 @@ export default function TarotPage() {
         router.push('/burn')
         break
     }
+  }
+
+  const variants = {
+    enter: (direction: 'left' | 'right') => ({
+      x: direction === 'left' ? 1000 : -1000,
+      opacity: 0
+    }),
+    center: {
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: 'left' | 'right') => ({
+      x: direction === 'left' ? -1000 : 1000,
+      opacity: 0
+    })
   }
 
   return (
@@ -87,46 +84,49 @@ export default function TarotPage() {
 
       {/* 卡片区域 */}
       <div className="flex-1 relative z-10 flex items-center justify-center px-8">
-        <AnimatePresence initial={false} custom={dragDirection} mode="wait">
-          <motion.div
-            key={currentCard}
-            custom={dragDirection}
-            variants={variants}
-            initial="enter"
-            animate="center"
-            exit="exit"
-            transition={{
-              x: { type: "spring", stiffness: 300, damping: 30 },
-              opacity: { duration: 0.2 }
-            }}
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.7}
-            onDragEnd={handleDragEnd}
-            onClick={() => handleCardClick(cards[currentCard].id)}
-            className="w-full max-w-[380px] aspect-[3/4] flex items-center justify-center cursor-pointer"
-          >
-            <Image
-              src={cards[currentCard].image}
-              alt={`Tarot Card ${currentCard + 1}`}
-              width={380}
-              height={507}
-              className="object-contain w-full h-full"
-              priority
-            />
-          </motion.div>
-        </AnimatePresence>
+        <div className="flex flex-col items-center">
+          {/* 滑动指示器移到这里 */}
+          <div className="flex justify-center gap-2 mb-4">
+            {cards.map((_, index) => (
+              <div
+                key={index}
+                className={`w-2 h-2 rounded-full ${
+                  index === currentCard ? 'bg-white' : 'bg-white/30'
+                }`}
+              />
+            ))}
+          </div>
 
-        {/* 添加滑动指示器 */}
-        <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-2">
-          {cards.map((_, index) => (
-            <div
-              key={index}
-              className={`w-2 h-2 rounded-full ${
-                index === currentCard ? 'bg-white' : 'bg-white/30'
-              }`}
-            />
-          ))}
+          {/* 卡片 */}
+          <AnimatePresence initial={false} custom={dragDirection} mode="wait">
+            <motion.div
+              key={currentCard}
+              custom={dragDirection}
+              variants={variants}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{
+                x: { type: "spring", stiffness: 300, damping: 30 },
+                opacity: { duration: 0.2 }
+              }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.7}
+              onDragEnd={handleDragEnd}
+              onClick={() => handleCardClick(cards[currentCard].id)}
+              className="w-full max-w-[380px] aspect-[3/4] flex items-center justify-center cursor-pointer"
+            >
+              <Image
+                src={cards[currentCard].image}
+                alt={`Tarot Card ${currentCard + 1}`}
+                width={380}
+                height={507}
+                className="object-contain w-full h-full"
+                priority
+              />
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </main>

@@ -98,13 +98,13 @@ export default function Home() {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 5.69l5 4.5V18h-2v-6H9v6H7v-7.81l5-4.5M12 3L2 12h3v8h6v-6h2v6h6v-8h3L12 3z" />
           </svg>
-          <span className="text-xs mt-1">Home</span>
+          <span className="text-xs mt-1">Chat</span>
         </Link>
         <Link href="/tarot" className="flex flex-col items-center text-gray-400 hover:text-[#F4A261]">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
             <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H6l-2 2V4h16v12z" />
           </svg>
-          <span className="text-xs mt-1">Chat</span>
+          <span className="text-xs mt-1">Relax</span>
         </Link>
         <Link href="/journal" className="flex flex-col items-center text-gray-400 hover:text-[#F4A261]">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
