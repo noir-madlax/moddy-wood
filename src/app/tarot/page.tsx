@@ -63,18 +63,19 @@ export default function TarotPage() {
   }
 
   return (
-    <main className="h-screen relative overflow-hidden flex flex-col">
+    <main className="h-[100vh] h-[calc(var(--vh,1vh)*100)] relative overflow-hidden flex flex-col">
       {/* 背景图片 */}
       <Image
         src="/tarot/bg.png"
         alt="Background"
         fill
         priority
+        sizes="100vw"
         className="object-cover"
       />
 
       {/* 顶部导航 */}
-      <div className="relative z-10 px-4 py-3">
+      <div className="relative z-10 px-4 py-3 safe-top">
         <Link href="/" className="w-10 h-10 bg-[#1E1E2F] rounded-lg flex items-center justify-center">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
             <path d="M15 18l-6-6 6-6" />
@@ -83,9 +84,9 @@ export default function TarotPage() {
       </div>
 
       {/* 卡片区域 */}
-      <div className="flex-1 relative z-10 flex items-center justify-center px-8">
-        <div className="flex flex-col items-center">
-          {/* 滑动指示器移到这里 */}
+      <div className="flex-1 relative z-10 flex items-center justify-center px-4 sm:px-8">
+        <div className="flex flex-col items-center w-full max-w-[min(380px,90vw)]">
+          {/* 滑动指示器 */}
           <div className="flex justify-center gap-2 mb-4">
             {cards.map((_, index) => (
               <div
@@ -115,7 +116,7 @@ export default function TarotPage() {
               dragElastic={0.7}
               onDragEnd={handleDragEnd}
               onClick={() => handleCardClick(cards[currentCard].id)}
-              className="w-full max-w-[380px] aspect-[3/4] flex items-center justify-center cursor-pointer"
+              className="w-full aspect-[3/4] flex items-center justify-center cursor-pointer"
             >
               <Image
                 src={cards[currentCard].image}
@@ -123,6 +124,7 @@ export default function TarotPage() {
                 width={380}
                 height={507}
                 className="object-contain w-full h-full"
+                sizes="(max-width: 380px) 90vw, 380px"
                 priority
               />
             </motion.div>

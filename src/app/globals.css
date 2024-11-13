@@ -5,6 +5,7 @@
 :root {
   --foreground-rgb: 0, 0, 0;
   --background-rgb: 253, 248, 244;
+  --vh: 1vh;
 }
 
 body {
@@ -15,4 +16,34 @@ body {
 /* 添加底部安全区域 */
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 处理安全区域 */
+.safe-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* 禁用双击缩放 */
+* {
+  touch-action: manipulation;
+}
+
+/* 优化移动端点击效果 */
+@media (hover: none) {
+  .hover\:opacity-80:active {
+    opacity: 0.8;
+  }
+}
+
+/* 处理图片在不同设备上的显示 */
+.img-contain {
+  object-fit: contain;
+  width: 100%;
+  height: 100%;
+}
+
+.img-cover {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
 }
